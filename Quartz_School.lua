@@ -54,11 +54,32 @@ local castColor, schools, mschools, db, getOptions, cache, curSpells = {1, 0.7, 
 	Shadow = 32,
 	Arcane = 64
 }, {
+	Holystrike = 3,
+	Flamestrike = 5,
+	Radiant = 6,
+	Stormstrike = 9,
+	Holystorm = 10,
+	Volcanic = 12,
+	Froststrike = 17,
 	Frostfire = 20,
 	Froststorm = 24,
 	Elemental = 28,
+	Shadowstrike = 33,
+	Twilight = 34,
+	Shadowflame = 36,
+	Plague = 40,
 	Shadowfrost = 48,
-	Spellstorm = 72
+	Spellstrike = 65,
+	Divine = 66,
+	Spellfire = 68,
+	Astral = 72,
+	Spellfrost = 80,
+	--Chimeric = 84,
+	Spellshadow = 96,
+	Cosmic = 106,
+	ChaosChromatic = 124,
+	Magic = 126,
+	Chaos = 127
 }
 
 local defaults = {
@@ -81,16 +102,38 @@ local defaults = {
 		schoolColor = {
 			[1] = {1, 1, 0},
 			[2] = {1, 0.9, 0.5},
+			[3] = castColor,
 			[4] = {1, 0.5, 0},
+			[5] = castColor,
+			[6] = castColor,
 			[8] = {0.3, 1, 0.3},
+			[9] = castColor,
+			[10] = castColor,
+			[12] = castColor,
 			[16] = {0.5, 1, 1},
+			[17] = castColor,
 			[20] = castColor,
 			[24] = castColor,
 			[28] = castColor,
 			[32] = {0.5, 0.5, 1},
+			[33] = castColor,
+			[34] = castColor,
+			[36] = castColor,
+			[40] = castColor,
 			[48] = castColor,
+			--[62] = castColor,
 			[64] = {1, 0.5, 1},
-			[72] = castColor
+			[65] = castColor,
+			[66] = castColor,
+			[68] = castColor,
+			[72] = castColor,
+			[80] = castColor,
+			--[84] = castColor,
+			[96] = castColor,
+			[106] = castColor,
+			[124] = castColor,
+			[126] = castColor,
+			[127] = castColor
 		},
 	}
 }
@@ -108,7 +151,7 @@ end
 
 function School:OnEnable()
 	cache = {
-		[GetSpellInfo(5143)] = 64, -- "Arcane Missiles", localized
+		--[GetSpellInfo(5143)] = 64, -- "Arcane Missiles", localized
 	}
 	curSpells = {}
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -224,11 +267,32 @@ local function GetColorOptions()
 			[32] = {0.5, 0.5, 1},
 			[64] = {1, 0.5, 1},
 		}, {
-			[20] = icoTex("Ability_Mage_FrostFireBolt", 12) .. " Frostfire Bolt (" .. clrStr("Mage", "ff68ccef") .. ")",
+			[3] = icoTex("inv_weapon_rifle_07", 12) .. " NPC abilities",
+			[5] = icoTex("spell_fire_felflamering_red", 12) .. " NPC abilities",
+			[6] = icoTex("ability_mage_firestarter", 12) .. " Power Word: Radiance (" .. clrStr("Priest", "ffffffff") .. ")",
+			[9] = icoTex("ability_shaman_stormstrike", 12) .. " NPC abilities",
+			[10] = icoTex("inv_poison_mindnumbing", 12) .. " NPC abilities",
+			[12] = icoTex("ability_evoker_eruption", 12) .. " Eruption (" .. clrStr("Evoker", "ff33937f") .. ")",
+			[17] = icoTex("spell_deathknight_frozenruneweapon", 12) .. " NPC abilities",
+			[20] = icoTex("Inv_ability_frostfiremage_frostfirebolt", 12) .. " Frostfire Bolt (" .. clrStr("Mage", "ff3fc7eb") .. ")",
 			[24] = icoTex("Spell_Frost_Ice Shards", 12) .. " Froststorm Breath (Chimaera - Exotic " .. clrStr("Hunter", "ffaad372") .. " Pet)",
 			[28] = icoTex("Shaman_Talent_ElementalBlast", 12) .. " Elemental Blast (" .. clrStr("Shaman", "ff2359ff") .. ")",
-			[48] = icoTex("spell_priest_mindspike", 12) .. " Mind Spike (" .. clrStr("Priest", "fff0ebe0") .. ")",
-			[72] = icoTex("Spell_Arcane_Arcane03", 12) .. " Starsurge (" .. clrStr("Druid", "ffff7c0a") .. ")\n" .. icoTex("TalentSpec_Druid_Balance", 12) .. " Astral Communion (" .. clrStr("Druid", "ffff7c0a") .. ")"
+			[33] = icoTex("ability_argus_edgeofobliteration", 12) .. " NPC abilities",
+			[34] = icoTex("spell_shadow_twilight", 12) .. " NPC abilities",
+			[36] = icoTex("ability_warlock_handofguldan", 12) .. " Hand of Gul'dan (" .. clrStr("Warlock", "ff8788ee") .. ")",
+			[40] = icoTex("spell_shadow_plaguecloud", 12) .. " NPC abilities",
+			[48] = icoTex("spell_priest_mindspike", 12) .. " Mind Spike (" .. clrStr("Priest", "ffffffff") .. ")",
+			[65] = icoTex("spell_arcane_massdispel", 12) .. " NPC abilities",
+			[66] = icoTex("spell_holy_purifyingpower", 12) .. " NPC abilities",
+			[68] = icoTex("Inv_ability_chronowardenevoker_chronoflame", 12) .. " Chrono Flames (" .. clrStr("Evoker", "ff33937f") .. ")",
+			[72] = icoTex("ability_druid_stellarflare", 12) .. " Stellar Flare (" .. clrStr("Druid", "ffff7c0a") .. ")",
+			[80] = icoTex("ability_evoker_disintegrate", 12) .. " Disintegrate (" .. clrStr("Evoker", "ff33937f") .. ")",
+			--[84] = "No cast spells", --SoD only
+			[96] = icoTex("inv_spiritshard_02", 12) .. " NPC abilities",
+			[106] = icoTex("spell_progenitor_missile", 12) .. " NPC abilities",
+			[124] = icoTex("ability_warlock_chaosbolt", 12) .. " Chaos Bolt (" .. clrStr("Warlock", "ff8788ee") .. ")",
+			[126] = icoTex("spell_frostfire-orb", 12) .. " NPC abilities",
+			[127] = icoTex("ability_demonhunter_felblade", 12) .. " NPC abilities"
 		}
 		colorOptions = {
 			type = "group",
@@ -330,7 +394,7 @@ do
 				},
 				version = {
 					type = "description",
-					name = clrStr("Version: ", "ff00ff00") .. GetAddOnMetadata("Quartz_School", "Version"),
+					name = clrStr("Version: ", "ff00ff00") .. C_AddOns.GetAddOnMetadata("Quartz_School", "Version"),
 					order = 101
 				},
 				general = {
