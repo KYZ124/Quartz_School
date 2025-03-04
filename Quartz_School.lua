@@ -1,7 +1,7 @@
 --[[
 	Copyright (C) 2006-2007 Nymbia
 	Copyright (C) 2010-2017 Hendrik "Nevcairiel" Leppkes < h.leppkes@gmail.com >
-	Copyright (C) 2014 ccfreak < ccfreak987+qzsch@gmail.com >
+	Copyright (C) 2014 ccfreak (erjo__) < ccfreak987+qzsch@gmail.com >
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ local barInfo = {
 	}
 }
 
-local castColor, schools, mschools, db, getOptions, cache, curSpells = {1, 0.7, 0}, {
+local castColor, schools, mSchools, db, getOptions, cache, curSpells, idTranslation, idUmbrella = {1, 0.7, 0}, {
 	Physical = 1,
 	Holy = 2,
 	Fire = 4,
@@ -54,11 +54,15 @@ local castColor, schools, mschools, db, getOptions, cache, curSpells = {1, 0.7, 
 	Shadow = 32,
 	Arcane = 64
 }, {
-	Frostfire = 20,
+	Radiant = 6, -- (Holyfire)
 	Froststorm = 24,
 	Elemental = 28,
+	Twilight = 34, -- (Shadowlight)
+	Shadowflame = 36,
+	Plague = 40,
 	Shadowfrost = 48,
-	Spellstorm = 72
+	Astral = 72, -- (Spellstorm)
+	Chaos = 127
 }
 
 local defaults = {
@@ -82,16 +86,20 @@ local defaults = {
 			[1] = {1, 1, 0},
 			[2] = {1, 0.9, 0.5},
 			[4] = {1, 0.5, 0},
+			[6] = castColor,
 			[8] = {0.3, 1, 0.3},
 			[16] = {0.5, 1, 1},
-			[20] = castColor,
 			[24] = castColor,
 			[28] = castColor,
 			[32] = {0.5, 0.5, 1},
+			[34] = castColor,
+			[36] = castColor,
+			[40] = castColor,
 			[48] = castColor,
 			[64] = {1, 0.5, 1},
-			[72] = castColor
-		},
+			[72] = castColor,
+			[127] = castColor
+		}
 	}
 }
 
@@ -108,7 +116,16 @@ end
 
 function School:OnEnable()
 	cache = {
-		[GetSpellInfo(5143)] = 64, -- "Arcane Missiles", localized
+		--[5143] = 64, -- "Arcane Missiles", localized, seems to work without this now
+	}
+	idUmbrella = {
+		[47758] = 47540, -- Penance
+		[373129] = 400169 -- Dark Reprimand
+	}
+	idTranslation = {
+		-- unify the ids of the same spell under one id
+		[47757] = 47758, -- Penance
+		[400171] = 373129 -- Dark Reprimand
 	}
 	curSpells = {}
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -122,6 +139,8 @@ function School:OnDisable()
 	self:UnregisterEvent("UNIT_SPELLCAST_STOP")
 	cache = nil
 	curSpells = nil
+	idUmbrella = nil
+	idTranslation = nil
 end
 
 --[[
@@ -137,14 +156,15 @@ function School:CombatEventTriggered( ... )
 	local _, type, _, sourceGUID = ...
 	if type == "SPELL_CAST_START" or type == "SPELL_CAST_SUCCESS" then
 		local spellId, name, school = select(12, ...)
-		if cache[name] then
+		
+		if cache[spellId] then
 			return
 		end
-		cache[name] = school
-		-- UNIT_SPELLCAST-events happens before combat log, update bars casting the spell
+		cache[spellId] = school
+		-- UNIT_SPELLCAST-events happens before combat log, update bars casting the spell now when it's in the cache, (unit_spellcast-events did not trigger UpdateCastBar)
 		for unit, spell in pairs(curSpells) do
-			if spell == name then
-				self:UpdateCastBar(unit, spell)
+			if spell == spellId then
+				self:UpdateCastBar(unit --[[, spell]])
 			end
 		end
 	end
@@ -173,23 +193,39 @@ for unit, info in pairs(barInfo) do
 	end
 end
 
-function School:UpdateCastBar(unit, spell)
+function School:UpdateCastBar(unit --[[, xspellId]])
 	if not barInfo[unit] or not Quartz3:GetModuleEnabled(barInfo[unit].name) then
 		return
 	end
 	local mod = barInfo[unit].module
-	if not spell then
+	--if not spell then
 		if mod.Bar.channeling then
-			spell = UnitChannelInfo(unit)
+			--spell = UnitChannelInfo(unit)
+			name, _, _, _, _, _, notInterruptible, spellId = UnitChannelInfo(unit)
 		else
-			spell = UnitCastingInfo(unit)
+			--spell = UnitCastingInfo(unit)
+			name, _, _, _, _, _, _, notInterruptible, spellId = UnitCastingInfo(unit)
+			
 		end
+	--end
+
+	if idTranslation[spellId] then
+		-- unify the spellIds of the same spell and school under one id, Penance is really odd mechanically..
+		spellId = idTranslation[spellId]
 	end
-	curSpells[unit] = spell
-	if ( not mod.Bar.channeling and not db[unit].cast ) or ( mod.Bar.channeling and not db[unit].channel ) or not db.schoolColor[cache[spell]] or not db.useSchool[cache[spell]] then
+	if idUmbrella[spellId] then
+		-- "umbrella" spellId from CLEU that has another casting spellId
+		spellId = idUmbrella[spellId]
+	end
+
+	curSpells[unit] = --[[xspellId or]] spellId -- trying spellids in cache and curSpells, why xspellId tho?, testing w/o
+	if ( not mod.Bar.channeling and not db[unit].cast ) or ( mod.Bar.channeling and not db[unit].channel ) or not db.schoolColor[cache[spellId]] or not db.useSchool[cache[spellId]] then
 		return
 	end
-	mod.Bar.Bar:SetStatusBarColor(unpack(db.schoolColor[cache[spell]]))
+	-- prio on unit nointerrupt bar color if enabled on Q unit
+	if notInterruptible and mod.db.profile.noInterruptChangeColor then return end
+
+	mod.Bar.Bar:SetStatusBarColor(unpack(db.schoolColor[cache[spellId]]))
 end
 
 --[[
@@ -215,7 +251,7 @@ end
 local colorOptions
 local function GetColorOptions()
 	if not colorOptions then
-		local os, defaultColors, mschoolText, pos = 0, {
+		local os, defaultColors, mSchoolText, pos = 0, {
 			[1] = {1, 1, 0},
 			[2] = {1, 0.9, 0.5},
 			[4] = {1, 0.5, 0},
@@ -224,11 +260,16 @@ local function GetColorOptions()
 			[32] = {0.5, 0.5, 1},
 			[64] = {1, 0.5, 1},
 		}, {
-			[20] = icoTex("Ability_Mage_FrostFireBolt", 12) .. " Frostfire Bolt (" .. clrStr("Mage", "ff68ccef") .. ")",
+			[6] = icoTex("inv_staff_2h_artifacttome_d_01", 12) .. " Light's Wrath (" .. clrStr("Priest", "fff0ebe0") .. ")",
+			--[20] = icoTex("Ability_Mage_FrostFireBolt", 12) .. " Frostfire Bolt (" .. clrStr("Mage", "ff68ccef") .. ")",
 			[24] = icoTex("Spell_Frost_Ice Shards", 12) .. " Froststorm Breath (Chimaera - Exotic " .. clrStr("Hunter", "ffaad372") .. " Pet)",
 			[28] = icoTex("Shaman_Talent_ElementalBlast", 12) .. " Elemental Blast (" .. clrStr("Shaman", "ff2359ff") .. ")",
+			[34] = icoTex("spell_shadow_shadowbolt", 12) .. " Twilight's Wrath (Twilight Fanatic/Zealot)",
+			[36] = icoTex("ability_warlock_handofguldan", 12) .. " Hand of Gul'dan (" .. clrStr("Warlock", "ff8788ee") .. ")\n" .. icoTex("inv__demonbolt", 12) .. " Demonbolt (" .. clrStr("Warlock", "ff8788ee") .. ")",
+			[40] = icoTex("ability_deathknight_summongargoyle", 12) .. " Gargoyle Strike (" .. clrStr("Death Knight", "ffc41e3a") .. " Gargoyle)",
 			[48] = icoTex("spell_priest_mindspike", 12) .. " Mind Spike (" .. clrStr("Priest", "fff0ebe0") .. ")",
-			[72] = icoTex("Spell_Arcane_Arcane03", 12) .. " Starsurge (" .. clrStr("Druid", "ffff7c0a") .. ")\n" .. icoTex("TalentSpec_Druid_Balance", 12) .. " Astral Communion (" .. clrStr("Druid", "ffff7c0a") .. ")"
+			[72] = icoTex("ability_druid_stellarflare", 12) .. " Stellar Flare (" .. clrStr("Druid", "ffff7c0a") .. ")",
+			[127] = icoTex("ability_warlock_chaosbolt", 12) .. " Chaos Bolt (" .. clrStr("Warlock", "ff8788ee") .. ")\n" .. icoTex("ability_demonhunter_eyebeam", 12) .. " Eye Beam (" .. clrStr("Demon Hunter", "ffa330c9") .. ")"
 		}
 		colorOptions = {
 			type = "group",
@@ -277,12 +318,12 @@ local function GetColorOptions()
 			order = os + 2
 		}
 		os = os + 2
-		for school, id in pairs(mschools) do
+		for school, id in pairs(mSchools) do
 			pos = id * 2 + os
 			colorOptions.args[school .. "Color"] = {
 				type = "color",
 				name = school,
-				desc = school .. " color\n\n" .. clrStr("Common Casts/Channels:", "ff00ff00") .. "\n" .. mschoolText[id],
+				desc = school .. " color\n\n" .. clrStr("Common Casts/Channels:", "ff00ff00") .. "\n" .. mSchoolText[id],
 				get = function() return unpack(db.schoolColor[id]) end,
 				set = function(info, ...) db.schoolColor[id] = {...} end,
 				order = pos
