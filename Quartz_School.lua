@@ -88758,6 +88758,10 @@ function School:UpdateCastBar(unit --[[, xspellId]])
 		return
 	end
 	
+	if not db.schoolColor[spellIdSchoolMap[spellId]] then
+		return
+	end
+	
 	mod.Bar.Bar:SetStatusBarColor(unpack(db.schoolColor[spellIdSchoolMap[spellId]]))
 end
 
@@ -88814,8 +88818,8 @@ local function GetColorOptions()
 			--[72] = icoTex("ability_druid_stellarflare", 12) .. " Stellar Flare (" .. clrStr("Druid", "ffff7c0a") .. ")",
 			[80] = icoTex("ability_evoker_disintegrate", 12) .. " Disintegrate (" .. clrStr("Evoker", "ff33937f") .. ")",
 			--[84] = "No cast spells", --SoD only
-			[96] = icoTex("inv_cosmicvoid_debuff", 12) .. " Void Ray (" .. clrStr("Demon Hunter", "ffa330c9") .. ")",
-			[106] = icoTex("ability_creature_disease_05", 12) .. " Consume (" .. clrStr("Demon Hunter", "ffa330c9") .. ")",
+			[96] = icoTex("inv_12_dh_void_ability_voidray", 12) .. " Void Ray (" .. clrStr("Demon Hunter", "ffa330c9") .. ")",
+			[106] = icoTex("inv_12_dh_void_ability_consume", 12) .. " Consume (" .. clrStr("Demon Hunter", "ffa330c9") .. ")",
 			[124] = icoTex("ability_warlock_chaosbolt", 12) .. " Chaos Bolt (" .. clrStr("Warlock", "ff8788ee") .. ")",
 			--[126] = icoTex("spell_frostfire-orb", 12) .. " NPC abilities",
 			--[127] = icoTex("ability_demonhunter_felblade", 12) .. " NPC abilities"
