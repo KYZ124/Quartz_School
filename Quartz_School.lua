@@ -88555,7 +88555,7 @@ local spellIdSchoolMap = {
 }
 
 
-local castColor, schools, mSchools, db, getOptions, cache, curSpells, idTranslation, idUmbrella = {1, 0.7, 0}, {
+local castColor, schools, mSchools, db, getOptions, curSpells, idTranslation, idUmbrella = {1, 0.7, 0}, {
 	Physical = 1,
 	Holy = 2,
 	Fire = 4,
@@ -88659,9 +88659,6 @@ function School:OnInitialize()
 end
 
 function School:OnEnable()
-	cache = {
-		--[5143] = 64, -- "Arcane Missiles", localized, seems to work without this now
-	}
 	idUmbrella = {
 		[47758] = 47540, -- Penance
 		[373129] = 400169 -- Dark Reprimand
@@ -88681,7 +88678,6 @@ function School:OnDisable()
 	--self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
 	self:UnregisterEvent("UNIT_SPELLCAST_STOP")
-	cache = nil
 	curSpells = nil
 	idUmbrella = nil
 	idTranslation = nil
