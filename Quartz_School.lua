@@ -88834,7 +88834,7 @@ local function GetColorOptions()
 				name = school,
 				desc = school .. " color",
 				get = function() return unpack(db.schoolColor[id]) end,
-				set = function(...) db.schoolColor[id] = {...} end,
+				set = function(info, ...) db.schoolColor[id] = {...} end,
 				order = pos
 			}
 			pos = pos + 1
