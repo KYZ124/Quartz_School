@@ -34,14 +34,6 @@ local barInfo = {
 	pet = {
 		module = Quartz3:GetModule("Pet"),
 		name = "Pet"
-	},
-	target = {
-		module = Quartz3:GetModule("Target"),
-		name = "Target"
-	},
-	focus = {
-		module = Quartz3:GetModule("Focus"),
-		name = "Focus"
 	}
 }
 
@@ -88598,8 +88590,6 @@ local defaults = {
 			cast = 1
 		},
 		pet = {},
-		target = {},
-		focus = {},
 		useSchool = {
 			[1] = 1,
 			[2] = 1,
@@ -88958,30 +88948,6 @@ do
 							end,
 							order = 3,
 						},
-						toggletargetcast = {
-							type = "toggle",
-							name = "Target Casts",
-							desc = "Color target casts",
-							get = function()
-								return db.target.cast
-							end,
-							set = function(info, ...)
-								db.target.cast = ...
-							end,
-							order = 4,
-						},
-						toggletargetchannel = {
-							type = "toggle",
-							name = "Target Channels",
-							desc = "Color target channels",
-							get = function()
-								return db.target.channel
-							end,
-							set = function(info, ...)
-								db.target.channel = ...
-							end,
-							order = 5,
-						},
 						togglepetcast = {
 							type = "toggle",
 							name = "Pet Casts",
@@ -89005,30 +88971,6 @@ do
 								db.pet.channel = ...
 							end,
 							order = 7,
-						},
-						togglefocuscast = {
-							type = "toggle",
-							name = "Focus Casts",
-							desc = "Color focus casts",
-							get = function()
-								return db.focus.cast
-							end,
-							set = function(info, ...)
-								db.focus.cast = ...
-							end,
-							order = 8,
-						},
-						togglefocuschannel = {
-							type = "toggle",
-							name = "Focus Channels",
-							desc = "Color focus channels",
-							get = function()
-								return db.focus.channel
-							end,
-							set = function(info, ...)
-								db.focus.channel = ...
-							end,
-							order = 9,
 						},
 						headerSplit = {
 							type = "header",
