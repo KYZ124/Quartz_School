@@ -88703,8 +88703,6 @@ end
 
 function School:UpdateCastBar(unit --[[, xspellId]])
 	if not barInfo[unit] or not Quartz3:GetModuleEnabled(barInfo[unit].name) then
-	
-		print("Terrible news, everyone!")
 		return
 	end
 	local mod = barInfo[unit].module
