@@ -88874,7 +88874,7 @@ local function GetColorOptions()
 				name = school,
 				desc = school .. " color\n\n" .. clrStr("Common Casts/Channels:", "ff00ff00") .. "\n" .. mSchoolText[id],
 				get = function() return unpack(db.schoolColor[id]) end,
-				set = function(info, ...) db.schoolColor[id] = {...} end,
+				set = function(...) db.schoolColor[id] = {...} end,
 				order = pos
 			}
 			pos = pos + 1
@@ -88882,7 +88882,7 @@ local function GetColorOptions()
 				type = "toggle",
 				name = L["Enable"],
 				get = function() return db.useSchool[id] end,
-				set = function(info, enabled) db.useSchool[id] = enabled end,
+				set = function(enabled) db.useSchool[id] = enabled end,
 				order = pos
 			}
 			pos = pos + 1
@@ -88915,7 +88915,7 @@ do
 					name = L["Enable"],
 					desc = L["Enable"],
 					get = function() return Quartz3:GetModuleEnabled(MODNAME) end,
-					set = function(info, v) Quartz3:SetModuleEnabled(MODNAME, v) end,
+					set = function(v) Quartz3:SetModuleEnabled(MODNAME, v) end,
 					order = 100
 				},
 				version = {
@@ -88941,7 +88941,7 @@ do
 							get = function()
 								return db.player.cast
 							end,
-							set = function(info, ...)
+							set = function(...)
 								db.player.cast = ...
 							end,
 							order = 2,
@@ -88953,7 +88953,7 @@ do
 							get = function()
 								return db.player.channel
 							end,
-							set = function(info, ...)
+							set = function(...)
 								db.player.channel = ...
 							end,
 							order = 3,
@@ -88965,7 +88965,7 @@ do
 							get = function()
 								return db.target.cast
 							end,
-							set = function(info, ...)
+							set = function(...)
 								db.target.cast = ...
 							end,
 							order = 4,
@@ -88977,7 +88977,7 @@ do
 							get = function()
 								return db.target.channel
 							end,
-							set = function(info, ...)
+							set = function(...)
 								db.target.channel = ...
 							end,
 							order = 5,
@@ -88989,7 +88989,7 @@ do
 							get = function()
 								return db.pet.cast
 							end,
-							set = function(info, ...)
+							set = function(...)
 								db.pet.cast = ...
 							end,
 							order = 6,
@@ -89001,7 +89001,7 @@ do
 							get = function()
 								return db.pet.channel
 							end,
-							set = function(info, ...)
+							set = function(...)
 								db.pet.channel = ...
 							end,
 							order = 7,
@@ -89013,7 +89013,7 @@ do
 							get = function()
 								return db.focus.cast
 							end,
-							set = function(info, ...)
+							set = function(...)
 								db.focus.cast = ...
 							end,
 							order = 8,
@@ -89025,7 +89025,7 @@ do
 							get = function()
 								return db.focus.channel
 							end,
-							set = function(info, ...)
+							set = function(...)
 								db.focus.channel = ...
 							end,
 							order = 9,
