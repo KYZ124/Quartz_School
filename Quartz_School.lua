@@ -88842,7 +88842,7 @@ local function GetColorOptions()
 				type = "toggle",
 				name = L["Enable"],
 				get = function() return db.useSchool[id] end,
-				set = function(enabled) db.useSchool[id] = enabled end,
+				set = function(info, enabled) db.useSchool[id] = enabled end,
 				order = pos
 			}
 			pos = pos + 1
