@@ -151,13 +151,11 @@ function School:OnEnable()
 		[400171] = 373129 -- Dark Reprimand
 	}
 	curSpells = {}
-	--self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", "UnitSpellcastStop")
 	self:RegisterEvent("UNIT_SPELLCAST_STOP", "UnitSpellcastStop")
 end
 
 function School:OnDisable()
-	--self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
 	self:UnregisterEvent("UNIT_SPELLCAST_STOP")
 	curSpells = nil
