@@ -1,4 +1,4 @@
-## Interface: 120000, 120100
+## Interface: 16001
 ## Title: Quartz |cffffffffSchool|r
 ## Notes: Quartz module to change color after the spell school on cast bars.
 ## Author: erjo__, maintained by KYZ124
